@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "716121442038",
+    "project_id": "paaniwala-4ed53",
+    "storage_bucket": "paaniwala-4ed53.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:716121442038:android:8f4851f115c08cb6048ed7",
+        "android_client_info": {
+          "package_name": "com.example.paani"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "716121442038-123lg1ir2pqi80jgde1rslc7qo7cksi8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdpd8ngNW4P_5WO7RlqgpT5bWfkTH6pu4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "716121442038-123lg1ir2pqi80jgde1rslc7qo7cksi8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "716121442038-9teg8tknavq2am3oeenspokmhsqrh3vn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.paani"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
