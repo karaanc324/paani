@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 
+import 'package:paani/modal/product.dart';
+
 class DatabaseService {
   final String? uid;
 
@@ -35,7 +37,8 @@ class DatabaseService {
     }
   }
 
-  Future addProduct(String name, String type, String description) async {
+  Future addProduct(
+      String name, String type, String description, int price) async {
     var doc = productCollection.doc(uid);
     doc.get().then((docSnapShot) => {
           if (docSnapShot.exists)
@@ -47,6 +50,7 @@ class DatabaseService {
                     'name': name,
                     'type': type,
                     'description': description,
+                    'price': price
                     // 'role': role
                     // 'groups': [],
                     // 'profilePic': ''
@@ -91,46 +95,76 @@ class DatabaseService {
     return docSnapshot.docs;
   }
 
-  void addToCart() {
-
-    var doc = cartCollection.doc(uid);
-    doc.get().then((docSnapShot) => {
-      if (docSnapShot.exists)
-        {
-          cartCollection.doc(uid).update({
-            'Products': FieldValue.arrayUnion([
-              {
-                'pid': random.nextInt(90),
-                'name': name,
-                'type': type,
-                'description': description,
-                // 'role': role
-                // 'groups': [],
-                // 'profilePic': ''
-              }
-            ])
-          })
-        }
-      else
-        {
-          productCollection.doc(uid).set({
-            'Products': FieldValue.arrayUnion([
-              {
-                'pid': random.nextInt(90),
-                'name': name,
-                'type': type,
-                'description': description,
-                // 'role': role
-                // 'groups': [],
-                // 'profilePic': ''
-              }
-            ])
-          })
-        }
-    });
+  getCart() async {
+    var docSnapshot = await cartCollection.doc(uid).get();
+    if (docSnapshot.exists) {
+      print(docSnapshot.runtimeType);
+      print("qqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
+      print(docSnapshot.get('Products').runtimeType);
+      print(docSnapshot.get('Products'));
+      return docSnapshot.get('Products');
+    }
+    return null;
   }
 
-  // getProductsOfVendor() {
-  //
-  // }
+  bool addToCart(Product product) {
+    bool addedToCart = false;
+    var doc = cartCollection.doc(uid);
+    doc.get().then((docSnapShot) => {
+          if (docSnapShot.exists)
+            {
+              print("aaaaaaaaaaaaaaaaaaa"),
+              print(docSnapShot.get('Products')[0]),
+              for (int i = 0; i < docSnapShot.get('Products').length; i++)
+                {
+                  if (docSnapShot.get('Products')[i]['pid'] != product.pid)
+                    {
+                      cartCollection.doc(uid).update({
+                        'Products': FieldValue.arrayUnion([
+                          {
+                            'pid': product.pid,
+                            'name': product.name,
+                            'type': product.type,
+                            'description': product.description,
+                            'price': product.price,
+                            'unit': 1
+                            // 'groups': [],
+                            // 'profilePic': ''
+                          }
+                        ])
+                      }),
+                      addedToCart = true
+                    }
+                  // else {
+                  //   cartCollection.doc(uid).get().then((value) => (docs) {
+                  //
+                  //   })
+                  // }
+                }
+            }
+          else
+            {
+              cartCollection.doc(uid).set({
+                'Products': FieldValue.arrayUnion([
+                  {
+                    'pid': product.pid,
+                    'name': product.name,
+                    'type': product.type,
+                    'description': product.description,
+                    'price': product.price,
+                    'unit': 1
+                    // 'groups': [],
+                    // 'profilePic': ''
+                  }
+                ])
+              }),
+              addedToCart = true
+            }
+        });
+    return addedToCart;
+  }
 }
+
+// getProductsOfVendor() {
+//
+// }

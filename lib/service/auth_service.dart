@@ -81,4 +81,10 @@ class AuthService {
     PUser? puser=  _userFromFirebaseUser(getCurrentUser());
     return DatabaseService(uid: puser?.uid).getVendors();
   }
+
+  getCart() {
+    print("inside auth");
+    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+    return DatabaseService(uid: puser?.uid).getCart();
+  }
 }
