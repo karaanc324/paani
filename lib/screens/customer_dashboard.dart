@@ -3,6 +3,7 @@ import 'package:paani/screens/login.dart';
 import 'package:paani/screens/vendor_view.dart';
 
 import '../service/auth_service.dart';
+import '../service/database_service.dart';
 
 class CustomerDashboard extends StatefulWidget {
   const CustomerDashboard({Key? key}) : super(key: key);
@@ -126,9 +127,9 @@ class CustomerDash extends StatelessWidget {
                   }
                   // return Text(snapshot.data.toString());
                 } else if (snapshot.connectionState == ConnectionState.none) {
-                  return Text("No data");
+                  return const Text("No data");
                 }
-                return CircularProgressIndicator();
+                return const CircularProgressIndicator();
                 // return Text("lol");
               },
             ),
@@ -156,7 +157,7 @@ class Settings extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => Login()),
                 (route) => false);
           },
-          title: Text('Signout'),
+          title: const Text('Signout'),
         )
       ],
     );
@@ -182,11 +183,13 @@ class CartDash extends StatelessWidget {
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
                     leading: IconButton(
-                      icon: Icon(Icons.remove),
-                      onPressed: () {},
+                      icon: const Icon(Icons.remove),
+                      onPressed: () {
+                        DatabaseService(uid: authService.getCurrentUser().uid).removeProductFromCart(snapshot.data[index]['pid']);
+                      },
                     ),
                     trailing: IconButton(
-                      icon: Icon(Icons.add),
+                      icon: const Icon(Icons.add),
                       onPressed: () {},
                     ),
                     title: Text(snapshot.data[index]['name'] +

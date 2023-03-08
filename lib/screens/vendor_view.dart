@@ -60,10 +60,10 @@ class _VendorViewState extends State<VendorView> {
                             // PUser pUser = jsonDecode(snapshot.data[index]);
                             Map<String, dynamic> values =
                             Map<String, dynamic>.from(snapshot.data[index]);
-                            // print("kkkkkkkkkkkkkkkkkkkkkkkkkk");
+                            print("kkkkkkkkkkkkkkkkkkkkkkkkkk");
                             // print(values.runtimeType);
-                            // print(values);
-                            Product prod  = Product(values['pid'], values['name'], values['type'], values['description'], 0, values['price']);
+                            print(values);
+                            Product prod = Product(values['pid'], values['name'], values['type'], values['description'], 0, values['price']);
                             // cartItems.add(prod);
                             // print(cartItems.length);
 
@@ -126,21 +126,23 @@ class _VendorViewState extends State<VendorView> {
                                     ),
                                     ElevatedButton(
                                         onPressed: () {
-                                          if (!isButtonDisabled) {
+                                          if (!prod.addedToCart) {
                                             print("======================");
                                             var addedToCart = DatabaseService(uid: authService.getCurrentUser().uid).addToCart(prod);
                                             if (addedToCart) {
                                               setState(() {
                                                 isButtonDisabled = true;
                                               });
-                                            } else{
+                                            } else {
                                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                                 content: Text("Item already in cart."),
                                               ));
                                             }
+                                          } else {
+                                            return null;
                                           }
                                         },
-                                        child: Text( isButtonDisabled? "Added" : "Add to cart")),
+                                        child: Text(prod.addedToCart? "Added" : "Add to cart")),
                                   ],
                                 ));
                           });
