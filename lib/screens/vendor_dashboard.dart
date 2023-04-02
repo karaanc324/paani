@@ -83,7 +83,6 @@ class CustomerDash extends StatelessWidget {
                   labelText: 'search product'),
             )),
             // Expanded(child: ElevatedButton(child: Icon(Icons.search), onPressed: () {
-            //   print('search');
             // },))
           ],
         ),
@@ -93,8 +92,6 @@ class CustomerDash extends StatelessWidget {
               future: authService.getProductsOfVendor(),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  // print(snapshot.data[0]);
-                  print(snapshot.hasData);
                   if (snapshot.hasData) {
                     return GridView.builder(
                         itemCount: snapshot.data.length,

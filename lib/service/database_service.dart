@@ -59,7 +59,6 @@ class DatabaseService {
                     'type': type,
                     'description': description,
                     'price': price,
-                    'addedToCart': true
                     // 'role': role
                     // 'groups': [],
                     // 'profilePic': ''
@@ -77,7 +76,6 @@ class DatabaseService {
                     'type': type,
                     'description': description,
                     'price': price,
-                    'addedToCart': true
                     // 'role': role
                     // 'groups': [],
                     // 'profilePic': ''
@@ -91,9 +89,6 @@ class DatabaseService {
   getProducts() async {
     var docSnapshot = await productCollection.doc(uid).get();
     if (docSnapshot.exists) {
-      print(docSnapshot.runtimeType);
-      print("qqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
-      print(docSnapshot.get('Products').runtimeType);
       return docSnapshot.get('Products');
     }
     return null;
@@ -101,18 +96,12 @@ class DatabaseService {
 
   getVendors() async {
     var docSnapshot = await userCollection.get();
-    print("tttttttttttttttttttttttt");
-    print(docSnapshot.docs.map((e) => e.data()));
     return docSnapshot.docs;
   }
 
   getCart() async {
     var docSnapshot = await cartCollection.doc(uid).get();
     if (docSnapshot.exists) {
-      print(docSnapshot.runtimeType);
-      print("qqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
-      print(docSnapshot.get('Products').runtimeType);
-      print(docSnapshot.get('Products'));
       return docSnapshot.get('Products');
     }
     return null;
@@ -124,8 +113,6 @@ class DatabaseService {
     doc.get().then((docSnapShot) => {
           if (docSnapShot.exists)
             {
-              print("aaaaaaaaaaaaaaaaaaa"),
-              print(docSnapShot.get('Products')[0]),
               for (int i = 0; i < docSnapShot.get('Products').length; i++)
                 {
                   if (docSnapShot.get('Products')[i]['pid'] != product.pid)
@@ -138,7 +125,7 @@ class DatabaseService {
                             'type': product.type,
                             'description': product.description,
                             'price': product.price,
-                            'unit': 1
+                            'unit': 1,
                             // 'groups': [],
                             // 'profilePic': ''
                           }
@@ -181,39 +168,69 @@ class DatabaseService {
     doc.get().then((docSnapShot) => {
           if (docSnapShot.exists)
             {
-              print("aaaaaaaaaddddaaaaaaaaaa"),
-              print(docSnapShot.get('Products')[0]),
-              print(docSnapShot.get('Products')[0].runtimeType),
               for (int i = 0; i < docSnapShot.get('Products').length; i++)
                 {
                   if (docSnapShot.get('Products')[i]['pid'] == pid)
                     {
-                      print("insideeeeeeeeeeeeeeeeeeeeee"),
-                      print(docSnapShot.get('Products')[i]),
                       productToUpdate = docSnapShot.get('Products')[i],
-                      print(productToUpdate),
                       cartCollection.doc(uid).update({
-                        'Products': FieldValue.arrayRemove(
-                            [productToUpdate])
+                        'Products': FieldValue.arrayRemove([productToUpdate])
                       }),
-                      if (productToUpdate['unit'] > 1) {
-                        print(productToUpdate['pid']),
-                        cartCollection.doc(uid).update({
-                          'Products': FieldValue.arrayUnion([
-                            {
-                              'pid': productToUpdate['pid'],
-                              'name': productToUpdate['name'],
-                              'type': productToUpdate['type'],
-                              'description': productToUpdate
-                              ['description'],
-                              'price': productToUpdate['price'],
-                              'unit': --productToUpdate['unit']
-                              // 'groups': [],
-                              // 'profilePic': ''
-                            }
-                          ])
-                        }),
-                      },
+                      if (productToUpdate['unit'] > 1)
+                        {
+                          cartCollection.doc(uid).update({
+                            'Products': FieldValue.arrayUnion([
+                              {
+                                'pid': productToUpdate['pid'],
+                                'name': productToUpdate['name'],
+                                'type': productToUpdate['type'],
+                                'description': productToUpdate['description'],
+                                'price': productToUpdate['price'],
+                                'unit': --productToUpdate['unit']
+                                // 'groups': [],
+                                // 'profilePic': ''
+                              }
+                            ])
+                          }),
+                        },
+                      addedToCart = true
+                    }
+                  else
+                    {cartCollection.doc(uid).get().then((value) => (docs) {})}
+                }
+            }
+        });
+    return addedToCart;
+  }
+
+  addProductToCart(int pid) {
+    bool addedToCart = false;
+    var doc = cartCollection.doc(uid);
+    doc.get().then((docSnapShot) => {
+          if (docSnapShot.exists)
+            {
+              for (int i = 0; i < docSnapShot.get('Products').length; i++)
+                {
+                  if (docSnapShot.get('Products')[i]['pid'] == pid)
+                    {
+                      productToUpdate = docSnapShot.get('Products')[i],
+                      cartCollection.doc(uid).update({
+                        'Products': FieldValue.arrayRemove([productToUpdate])
+                      }),
+                      cartCollection.doc(uid).update({
+                        'Products': FieldValue.arrayUnion([
+                          {
+                            'pid': productToUpdate['pid'],
+                            'name': productToUpdate['name'],
+                            'type': productToUpdate['type'],
+                            'description': productToUpdate['description'],
+                            'price': productToUpdate['price'],
+                            'unit': ++productToUpdate['unit']
+                            // 'groups': [],
+                            // 'profilePic': ''
+                          }
+                        ])
+                      }),
                       addedToCart = true
                     }
                   else
@@ -240,6 +257,50 @@ class DatabaseService {
           //   }
         });
     return addedToCart;
+  }
+
+  Future<bool> checkIfProductInCart(int pid) async {
+    // var docSnapshot = await cartCollection.doc(uid).get();
+    // if (docSnapshot.exists) {
+    //   var products = docSnapshot.get('Products');
+    //   for(int i = 0; i < products.length; i++) {
+    //     if (products[i]['pid'] == pid) {
+    //       return true;
+    //     }
+    //   }
+    // }
+    // return false;
+    bool addedToCart = false;
+    var doc = cartCollection.doc(uid);
+    print("aamaa");
+    await doc.get().then((docSnapShot) {
+      print('wow');
+    for (int i = 0; i < docSnapShot.get('Products').length; i++) {
+      if (docSnapShot.get('Products')[i]['pid'] == pid) {
+        print('avni');
+        print(pid);
+        print(docSnapShot.get('Products')[i]);
+        addedToCart = true;
+        break;
+      }
+    }
+    });
+    print("final");
+    print(addedToCart);
+    return addedToCart;
+
+
+    //   await cartCollection.doc(uid).get().then((docSnapshot) => {
+  //   if (docSnapshot.exists) {
+  //   var products = docSnapshot.get('Products'),
+  //   for(int i = 0; i < products.length; i++) {
+  //     if (products[i].get('pid') == pid) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
+  //   });
   }
 }
 

@@ -39,7 +39,6 @@ class _VendorViewState extends State<VendorView> {
                           labelText: 'search product'),
                     )),
                 // Expanded(child: ElevatedButton(child: Icon(Icons.search), onPressed: () {
-                //   print('search');
                 // },))
               ],
             ),
@@ -60,12 +59,12 @@ class _VendorViewState extends State<VendorView> {
                             // PUser pUser = jsonDecode(snapshot.data[index]);
                             Map<String, dynamic> values =
                             Map<String, dynamic>.from(snapshot.data[index]);
-                            print("kkkkkkkkkkkkkkkkkkkkkkkkkk");
-                            // print(values.runtimeType);
-                            print(values);
                             Product prod = Product(values['pid'], values['name'], values['type'], values['description'], 0, values['price']);
+                            // authService.getCart().then((cartItem) => {
+                            //
+                            // });
                             // cartItems.add(prod);
-                            // print(cartItems.length);
+                            // cart = getCart
 
                             // return Card(child: Text('lol'),);
                             return Card(
@@ -126,23 +125,23 @@ class _VendorViewState extends State<VendorView> {
                                     ),
                                     ElevatedButton(
                                         onPressed: () {
-                                          if (!prod.addedToCart) {
-                                            print("======================");
-                                            var addedToCart = DatabaseService(uid: authService.getCurrentUser().uid).addToCart(prod);
-                                            if (addedToCart) {
-                                              setState(() {
-                                                isButtonDisabled = true;
-                                              });
-                                            } else {
-                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                content: Text("Item already in cart."),
-                                              ));
-                                            }
-                                          } else {
-                                            return null;
-                                          }
+                                          // if (true) {
+                                          //   var addedToCart = DatabaseService(uid: authService.getCurrentUser().uid).addToCart(prod);
+                                          //   if (addedToCart) {
+                                          //     setState(() {
+                                          //       isButtonDisabled = true;
+                                          //     });
+                                          //   } else {
+                                          //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                          //       content: Text("Item already in cart."),
+                                          //     ));
+                                          //   }
+                                          // } else {
+                                          //   return null;
+                                          // }
+                                          checkIfProductInCart(prod.pid);
                                         },
-                                        child: Text(prod.addedToCart? "Added" : "Add to cart")),
+                                        child: Text(true? "Added" : "Add to cart")),
                                   ],
                                 ));
                           });
@@ -164,4 +163,12 @@ class _VendorViewState extends State<VendorView> {
       ),
     );
   }
+
+  Future<bool> checkIfProductInCart(int pid) {
+    var lol = authService.checkIfProductInCart(pid);
+    print('karanaa');
+    print(lol);
+    return lol;
+  }
+
 }

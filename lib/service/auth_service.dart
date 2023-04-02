@@ -22,7 +22,6 @@ class AuthService {
   Future signOut() async {
     try {
       return await auth.signOut().whenComplete(() async {
-        print("Logged out");
       });
     } catch (e) {
       print(e.toString());
@@ -40,7 +39,6 @@ class AuthService {
           .updateUserDetail(name, email, contact, password, role);
       return _userFromFirebaseUser(user!);
     } catch (e) {
-      print("11111111111111111111111");
       print(e.toString());
       return null;
     }
@@ -53,7 +51,6 @@ class AuthService {
       User? user = newUser.user;
       return _userFromFirebaseUser(user!);
     } catch (e) {
-      print("11111111111111111111111");
       print(e.toString());
       return null;
     }
@@ -83,8 +80,15 @@ class AuthService {
   }
 
   getCart() {
-    print("inside auth");
-    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+    PUser? puser = _userFromFirebaseUser(getCurrentUser());
     return DatabaseService(uid: puser?.uid).getCart();
   }
+
+   checkIfProductInCart(int pid) {
+    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+
+    return DatabaseService(uid: puser?.uid).checkIfProductInCart(pid);
+  }
+
+
 }

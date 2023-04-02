@@ -92,9 +92,6 @@ class CustomerDash extends StatelessWidget {
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   // print(snapshot.data[0]);
-                  print(snapshot.hasData);
-                  print(snapshot.data);
-                  print(snapshot.data[0].get('name'));
                   if (snapshot.hasData) {
                     return GridView.builder(
                         itemCount: snapshot.data.length,
@@ -190,13 +187,14 @@ class CartDash extends StatelessWidget {
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.add),
-                      onPressed: () {},
+                      onPressed: () {
+                          DatabaseService(uid: authService.getCurrentUser().uid).addProductToCart(snapshot.data[index]['pid']);
+                      },
                     ),
                     title: Text(snapshot.data[index]['name'] +
                         '   ->   ' +
                         snapshot.data[index]['unit'].toString()),
                     onTap: () {
-                      print("oooooooooo");
                     },
                   );
                   return Column(
