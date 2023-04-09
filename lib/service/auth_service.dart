@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
+import 'package:paani/modal/product.dart';
 import 'package:paani/modal/puser.dart';
 
 import 'database_service.dart';
@@ -88,6 +89,36 @@ class AuthService {
     PUser? puser=  _userFromFirebaseUser(getCurrentUser());
 
     return DatabaseService(uid: puser?.uid).checkIfProductInCart(pid);
+  }
+
+   removeProductFromCart(data) {
+    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+
+    return DatabaseService(uid: puser?.uid).removeProductFromCart(data);
+  }
+
+   addProductToCart(data) {
+    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+
+    return DatabaseService(uid: puser?.uid).addProductToCart(data);
+  }
+
+  bool addToCart(Product prod) {
+    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+
+    return DatabaseService(uid: puser?.uid).addToCart(prod);
+  }
+
+  checkCart(String id) {
+    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+
+    return DatabaseService(uid: puser?.uid).checkCart(id);
+  }
+
+   clearCart() {
+    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+
+    return DatabaseService(uid: puser?.uid).clearCart();
   }
 
 

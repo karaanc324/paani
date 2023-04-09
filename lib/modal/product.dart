@@ -5,7 +5,8 @@ class Product {
   late String description;
   late int unit;
   late int price;
+  late String vendorId;
 
-  Product(this.pid, this.name, this.type, this.description, this.unit, this.price);
+  Product(this.pid, this.name, this.type, this.description, this.price, this.vendorId);
 // picture
 }

@@ -59,7 +59,7 @@ class DatabaseService {
                     'type': type,
                     'description': description,
                     'price': price,
-                    // 'role': role
+                    'vendorId': uid
                     // 'groups': [],
                     // 'profilePic': ''
                   }
@@ -76,7 +76,7 @@ class DatabaseService {
                     'type': type,
                     'description': description,
                     'price': price,
-                    // 'role': role
+                    'vendorId': uid
                     // 'groups': [],
                     // 'profilePic': ''
                   }
@@ -107,16 +107,33 @@ class DatabaseService {
     return null;
   }
 
+  checkCart(String id) async {
+    print(id);
+    var docSnapshot = await cartCollection.doc(uid).get();
+    if (docSnapshot.exists) {
+      print("---======-----");
+      print(docSnapshot.get('Products')[0]['vendorId']);
+
+      if (docSnapshot.get('Products')[0]['vendorId'] != id) {
+        return false;
+      }
+
+    }
+    print("not hotdog");
+    return true;
+  }
+
   bool addToCart(Product product) {
+    print('indifr sdd to ct');
     bool addedToCart = false;
     var doc = cartCollection.doc(uid);
     doc.get().then((docSnapShot) => {
           if (docSnapShot.exists)
             {
-              for (int i = 0; i < docSnapShot.get('Products').length; i++)
-                {
-                  if (docSnapShot.get('Products')[i]['pid'] != product.pid)
-                    {
+                  checkIfProductInCart(product.pid).then((value) {
+                    if (value) {
+                      addedToCart = true;
+                    } else {
                       cartCollection.doc(uid).update({
                         'Products': FieldValue.arrayUnion([
                           {
@@ -130,34 +147,35 @@ class DatabaseService {
                             // 'profilePic': ''
                           }
                         ])
-                      }),
-                      addedToCart = true
+                      });
+                    addedToCart = true;
                     }
+                  })
                   // else {
                   //   cartCollection.doc(uid).get().then((value) => (docs) {
                   //
                   //   })
                   // }
-                }
             }
-          // else
-          //   {
-          //     cartCollection.doc(uid).set({
-          //       'Products': FieldValue.arrayUnion([
-          //         {
-          //           'pid': product.pid,
-          //           'name': product.name,
-          //           'type': product.type,
-          //           'description': product.description,
-          //           'price': product.price,
-          //           'unit': 1
-          //           // 'groups': [],
-          //           // 'profilePic': ''
-          //         }
-          //       ])
-          //     }),
-          //     addedToCart = true
-          //   }
+          else
+            {
+              cartCollection.doc(uid).set({
+                'Products': FieldValue.arrayUnion([
+                  {
+                    'pid': product.pid,
+                    'name': product.name,
+                    'type': product.type,
+                    'description': product.description,
+                    'price': product.price,
+                    'unit': 1,
+                    'vendorId': product.vendorId
+                    // 'groups': [],
+                    // 'profilePic': ''
+                  }
+                ])
+              }),
+              addedToCart = true
+            }
         });
     return addedToCart;
   }
@@ -186,7 +204,8 @@ class DatabaseService {
                                 'type': productToUpdate['type'],
                                 'description': productToUpdate['description'],
                                 'price': productToUpdate['price'],
-                                'unit': --productToUpdate['unit']
+                                'unit': --productToUpdate['unit'],
+                                'vendorId': productToUpdate['vendorId']
                                 // 'groups': [],
                                 // 'profilePic': ''
                               }
@@ -225,7 +244,8 @@ class DatabaseService {
                             'type': productToUpdate['type'],
                             'description': productToUpdate['description'],
                             'price': productToUpdate['price'],
-                            'unit': ++productToUpdate['unit']
+                            'unit': ++productToUpdate['unit'],
+                            'vendorId': productToUpdate['vendorId']
                             // 'groups': [],
                             // 'profilePic': ''
                           }
@@ -274,33 +294,38 @@ class DatabaseService {
     var doc = cartCollection.doc(uid);
     print("aamaa");
     await doc.get().then((docSnapShot) {
-      print('wow');
-    for (int i = 0; i < docSnapShot.get('Products').length; i++) {
-      if (docSnapShot.get('Products')[i]['pid'] == pid) {
-        print('avni');
-        print(pid);
-        print(docSnapShot.get('Products')[i]);
-        addedToCart = true;
-        break;
+      if(docSnapShot.exists) {
+        print('wow');
+        for (int i = 0; i < docSnapShot.get('Products').length; i++) {
+          if (docSnapShot.get('Products')[i]['pid'] == pid) {
+            print('avni');
+            print(pid);
+            print(docSnapShot.get('Products')[i]);
+            addedToCart = true;
+            break;
+          }
+        }
       }
-    }
     });
     print("final");
     print(addedToCart);
     return addedToCart;
 
-
     //   await cartCollection.doc(uid).get().then((docSnapshot) => {
-  //   if (docSnapshot.exists) {
-  //   var products = docSnapshot.get('Products'),
-  //   for(int i = 0; i < products.length; i++) {
-  //     if (products[i].get('pid') == pid) {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
-  //   });
+    //   if (docSnapshot.exists) {
+    //   var products = docSnapshot.get('Products'),
+    //   for(int i = 0; i < products.length; i++) {
+    //     if (products[i].get('pid') == pid) {
+    //       return true;
+    //     }
+    //   }
+    //   return false;
+    // }
+    //   });
+  }
+
+  Future<void> clearCart() async {
+    await cartCollection.doc(uid).delete();
   }
 }
 

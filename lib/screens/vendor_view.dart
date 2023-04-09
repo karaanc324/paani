@@ -59,14 +59,9 @@ class _VendorViewState extends State<VendorView> {
                             // PUser pUser = jsonDecode(snapshot.data[index]);
                             Map<String, dynamic> values =
                             Map<String, dynamic>.from(snapshot.data[index]);
-                            Product prod = Product(values['pid'], values['name'], values['type'], values['description'], 0, values['price']);
-                            // authService.getCart().then((cartItem) => {
-                            //
-                            // });
-                            // cartItems.add(prod);
-                            // cart = getCart
-
-                            // return Card(child: Text('lol'),);
+                            print("999999999");
+                            print(values);
+                            Product prod = Product(values['pid'], values['name'], values['type'], values['description'], values['price'], values['vendorId']);
                             return Card(
                                 child: Column(
                                   // crossAxisAlignment: CrossAxisAlignment.center,
@@ -80,68 +75,27 @@ class _VendorViewState extends State<VendorView> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: const [
-                                        // InkWell(
-                                        //     onTap: () {
-                                        //       setState(() {
-                                        //         if (cartItems[index].unit > 0) {
-                                        //           cartItems[index].unit--;
-                                        //         }
-                                        //       });
-                                        //       itemCount --;
-                                        //     },
-                                        //     child: const Icon(
-                                        //       Icons.remove,
-                                        //       color: Colors.black,
-                                        //       size: 16,
-                                        //     )),
-                                        // Container(
-                                        //   margin:
-                                        //       const EdgeInsets.symmetric(horizontal: 3),
-                                        //   padding: const EdgeInsets.symmetric(
-                                        //       horizontal: 3, vertical: 2),
-                                        //   decoration: BoxDecoration(
-                                        //       borderRadius:
-                                        //           BorderRadius.circular(3),
-                                        //       color: Colors.white),
-                                        //   child: Text(
-                                        //     '${cartItems[index].unit}',
-                                        //     style: const TextStyle(
-                                        //         color: Colors.black, fontSize: 16),
-                                        //   ),
-                                        // ),
-                                        // InkWell(
-                                        //     onTap: () {
-                                        //       setState(() {
-                                        //         cartItems[index].unit++;
-                                        //       });
-                                        //       itemCount ++;
-                                        //     },
-                                        //     child: const Icon(
-                                        //       Icons.add,
-                                        //       color: Colors.black,
-                                        //       size: 16,
-                                        //     )),
                                       ],
                                     ),
                                     ElevatedButton(
-                                        onPressed: () {
-                                          // if (true) {
-                                          //   var addedToCart = DatabaseService(uid: authService.getCurrentUser().uid).addToCart(prod);
-                                          //   if (addedToCart) {
-                                          //     setState(() {
-                                          //       isButtonDisabled = true;
-                                          //     });
-                                          //   } else {
-                                          //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                          //       content: Text("Item already in cart."),
-                                          //     ));
-                                          //   }
-                                          // } else {
-                                          //   return null;
-                                          // }
-                                          checkIfProductInCart(prod.pid);
+                                        onPressed: () async {
+                                          bool addedToCart = false;
+
+                                          await checkIfProductInCart(prod.pid).then((value) => addedToCart = value);
+                                          print("wwwwwoowowowowowow");
+                                          print(addedToCart);
+                                          if (addedToCart) {
+                                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                              content: Text("Item already in cart."),
+                                            ));
+                                          } else {
+                                            authService.addToCart(prod);
+                                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                              content: Text("Added to cart."),
+                                            ));
+                                          }
                                         },
-                                        child: Text(true? "Added" : "Add to cart")),
+                                        child: const Text("Add to cart")),
                                   ],
                                 ));
                           });

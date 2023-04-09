@@ -104,16 +104,48 @@ class CustomerDash extends StatelessWidget {
                           if (snapshot.data[index].get('role') == 'vendor') {
                             return Card(
                               child: InkResponse(
-                                child: Text(snapshot.data[index].get('name')),
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => VendorView(
-                                              vendorId: snapshot.data[index]
-                                                  .get('uid'))));
-                                },
-                              ),
+                                  child: Text(snapshot.data[index].get('name')),
+                                  onTap: () {
+                                    authService.checkCart(snapshot.data[index].get('uid')).then((val) {
+                                      if (val) {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => VendorView(
+                                                    vendorId: snapshot.data[index]
+                                                        .get('uid'))));
+                                      } else {
+                                        try {
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                              content: Text("Items in cart from another vendor. Do you wanna remove them?"),
+                                            action: SnackBarAction(
+                                              label: 'Yes',
+                                              onPressed: () {
+                                                authService.clearCart();
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) => VendorView(
+                                                            vendorId: snapshot.data[index]
+                                                                .get('uid'))));
+                                              },
+                                            ),
+                                          ));
+                                        } on Exception catch (e, s) {
+                                          print(s);
+                                        }
+                                        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                        //   content: Text("Items in cart from another vendor. Do you wanna remove them?"),
+                                        //   action: SnackBarAction(
+                                        //       label: 'Yes', onPressed: () {
+                                        //         print("asdadasd");
+                                        //         authService.removeProductFromCart(data);
+                                        //   },
+                                        // ));
+                                      }
+                                    });
+
+                                  }),
                             );
                           } else {
                             return Container();
@@ -175,36 +207,49 @@ class CartDash extends StatelessWidget {
         future: authService.getCart(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    leading: IconButton(
-                      icon: const Icon(Icons.remove),
-                      onPressed: () {
-                        DatabaseService(uid: authService.getCurrentUser().uid).removeProductFromCart(snapshot.data[index]['pid']);
-                      },
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () {
-                          DatabaseService(uid: authService.getCurrentUser().uid).addProductToCart(snapshot.data[index]['pid']);
-                      },
-                    ),
-                    title: Text(snapshot.data[index]['name'] +
-                        '   ->   ' +
-                        snapshot.data[index]['unit'].toString()),
-                    onTap: () {
-                    },
-                  );
-                  return Column(
-                    children: [
-                      Row(
-                        children: [Text(snapshot.data[index]['name'])],
-                      ),
-                    ],
-                  );
-                });
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          leading: IconButton(
+                            icon: const Icon(Icons.remove),
+                            onPressed: () {
+                              authService.removeProductFromCart(
+                                  snapshot.data[index]['pid']);
+                            },
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: () {
+                              authService.addProductToCart(
+                                  snapshot.data[index]['pid']);
+                            },
+                          ),
+                          title: Text(snapshot.data[index]['name'] +
+                              '   ->   ' +
+                              snapshot.data[index]['unit'].toString()),
+                          onTap: () {},
+                        );
+                        return Column(
+                          children: [
+                            Row(
+                              children: [Text(snapshot.data[index]['name'])],
+                            ),
+                          ],
+                        );
+                      }),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    print('placing the order');
+                  },
+                  child: const Text('Place Order'),
+                )
+              ],
+            );
           } else if (snapshot.connectionState == ConnectionState.none) {
             return const Text("No data");
           }
