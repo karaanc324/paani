@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:paani/modal/product.dart';
 import 'package:paani/modal/puser.dart';
@@ -11,6 +12,7 @@ class AuthService {
 
   AuthService() {
     _intializeMe().then((_) {
+      print('=============initializing');
       auth = FirebaseAuth.instance;
     });
   }
@@ -59,6 +61,8 @@ class AuthService {
 
   // create user object based on FirebaseUser
   PUser? _userFromFirebaseUser(User user) {
+    print("=============");
+    print(user);
     return (user != null) ? PUser(uid: user.uid) : null;
   }
 
@@ -67,6 +71,8 @@ class AuthService {
   }
 
   getCurrentUser() {
+    print("inside auth");
+    print(auth.currentUser);
     return auth.currentUser;
   }
 
@@ -83,6 +89,22 @@ class AuthService {
   getCart() {
     PUser? puser = _userFromFirebaseUser(getCurrentUser());
     return DatabaseService(uid: puser?.uid).getCart();
+  }
+
+  getAddresses() {
+    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+    return DatabaseService(uid: puser?.uid).getAddresses();  }
+
+  getAddr() {
+    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+    return DatabaseService(uid: puser?.uid).getAddr();  }
+
+
+
+  void addAddress(String name, String contact, String fullAddress, String pincode) {
+    PUser? puser=  _userFromFirebaseUser(getCurrentUser());
+
+    return DatabaseService(uid: puser?.uid).addAddress(name, contact, fullAddress, pincode);
   }
 
    checkIfProductInCart(int pid) {
@@ -120,6 +142,7 @@ class AuthService {
 
     return DatabaseService(uid: puser?.uid).clearCart();
   }
+
 
 
 }

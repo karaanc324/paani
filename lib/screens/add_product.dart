@@ -16,7 +16,7 @@ class AddProduct extends StatelessWidget {
     return Scaffold(
       body: Form(
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 80.0),
+          padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 80.0),
           children: [
             const Center(
                 child: Text(

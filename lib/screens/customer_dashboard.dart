@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paani/screens/address_screen.dart';
 import 'package:paani/screens/login.dart';
 import 'package:paani/screens/vendor_view.dart';
 
@@ -106,18 +107,26 @@ class CustomerDash extends StatelessWidget {
                               child: InkResponse(
                                   child: Text(snapshot.data[index].get('name')),
                                   onTap: () {
-                                    authService.checkCart(snapshot.data[index].get('uid')).then((val) {
+                                    print("-----------------");
+                                    authService
+                                        .checkCart(
+                                            snapshot.data[index].get('uid'))
+                                        .then((val) {
                                       if (val) {
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => VendorView(
-                                                    vendorId: snapshot.data[index]
-                                                        .get('uid'))));
+                                                builder: (context) =>
+                                                    VendorView(
+                                                        vendorId: snapshot
+                                                            .data[index]
+                                                            .get('uid'))));
                                       } else {
                                         try {
-                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                              content: Text("Items in cart from another vendor. Do you wanna remove them?"),
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text(
+                                                "Items in cart from another vendor. Do you wanna remove them?"),
                                             action: SnackBarAction(
                                               label: 'Yes',
                                               onPressed: () {
@@ -125,9 +134,12 @@ class CustomerDash extends StatelessWidget {
                                                 Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                        builder: (context) => VendorView(
-                                                            vendorId: snapshot.data[index]
-                                                                .get('uid'))));
+                                                        builder: (context) =>
+                                                            VendorView(
+                                                                vendorId: snapshot
+                                                                    .data[index]
+                                                                    .get(
+                                                                        'uid'))));
                                               },
                                             ),
                                           ));
@@ -144,7 +156,6 @@ class CustomerDash extends StatelessWidget {
                                         // ));
                                       }
                                     });
-
                                   }),
                             );
                           } else {
@@ -181,82 +192,184 @@ class Settings extends StatelessWidget {
       children: [
         ListTile(
           onTap: () {
-            authService.signOut();
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddressScreen()),
+                );
+          },
+          title: const Text('My Adresses'),
+        ),
+        ListTile(
+          onTap: () {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => Login()),
-                (route) => false);
+                    (route) => false);
           },
           title: const Text('Signout'),
-        )
+        ),
       ],
     );
   }
 }
+//
+// class CartDash extends StatefulWidget {
+//   CartDash({
+//     Key? key,
+//   }) : super(key: key);
+//   final AuthService authService = AuthService();
+//
+//   @override
+//   State<StatefulWidget> createState() {
+//     // TODO: implement createState
+//     throw UnimplementedError();
+//   }
+// }
 
-class CartDash extends StatelessWidget {
-  CartDash({
-    Key? key,
-  }) : super(key: key);
+class CartDash extends StatefulWidget {
+  const CartDash({Key? key}) : super(key: key);
+
+  @override
+  State<CartDash> createState() => _CartDashState();
+}
+
+class _CartDashState extends State<CartDash> {
   final AuthService authService = AuthService();
+  var dropdownValue = [];
+  late num totalPrice = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // authService.getAddresses().data();
+
+  }
 
   @override
   Widget build(BuildContext context) {
-    // return Column(
-    //   children: [
-    return FutureBuilder(
-        future: authService.getCart(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                          leading: IconButton(
-                            icon: const Icon(Icons.remove),
-                            onPressed: () {
-                              authService.removeProductFromCart(
-                                  snapshot.data[index]['pid']);
-                            },
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.add),
-                            onPressed: () {
-                              authService.addProductToCart(
-                                  snapshot.data[index]['pid']);
-                            },
-                          ),
-                          title: Text(snapshot.data[index]['name'] +
-                              '   ->   ' +
-                              snapshot.data[index]['unit'].toString()),
-                          onTap: () {},
-                        );
-                        return Column(
-                          children: [
-                            Row(
-                              children: [Text(snapshot.data[index]['name'])],
-                            ),
-                          ],
-                        );
-                      }),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    print('placing the order');
-                  },
-                  child: const Text('Place Order'),
-                )
-              ],
-            );
-          } else if (snapshot.connectionState == ConnectionState.none) {
-            return const Text("No data");
-          }
-          return const CircularProgressIndicator();
-        }
-        // )
-        // ],
-        );
+    // DropdownMenuItem dropdownValue = DropdownMenuItem(
+
+      // child: const Text('hhhhhh'),
+    // );
+
+    return Column(
+      children: [
+        // Flexible(
+        //     child: StreamBuilder(
+        //       stream: authService.getAddresses(),
+        //       builder: (BuildContext context, AsyncSnapshot snapshot) {
+        //         if (snapshot.connectionState == ConnectionState.active) {
+        //           List<dynamic> addresses = snapshot.data['addresses'];
+        //           var dropdownValue = addresses[0];
+        //           return DropdownButton(
+        //             value: dropdownValue, // Set the initial value to the first item in the list
+        //             onChanged: (newValue) {
+        //               print("yqwertyuiop setstate");
+        //               print(newValue);
+        //               setState(() {
+        //                 dropdownValue = newValue;
+        //               });
+        //               print(dropdownValue);
+        //             },
+        //             items: addresses.map<DropdownMenuItem>((dynamic value) {
+        //               print("==================kjhkjxhvjkcsv");
+        //               print(value);
+        //               return DropdownMenuItem(
+        //                 value: value,
+        //                 child: Text(value['name']),
+        //               );
+        //             }).toList(),);
+        //         } else if (snapshot.connectionState == ConnectionState.none) {
+        //           return const Text("No data");
+        //         }
+        //         return const CircularProgressIndicator();
+        //       }
+        //     )
+        // ),
+        // DropdownButton(
+        //     items: dropdownValue[0],
+        //     onChanged: (value) {
+        //
+        //     }),
+        Flexible(
+          child: StreamBuilder(
+              stream: authService.getCart(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.active) {
+                  List<dynamic> prodList = snapshot.data['Products'];
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                            itemCount: prodList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              print(prodList[index]['price']);
+                              totalPrice = totalPrice + prodList[index]['price'] * prodList[index]['unit'];
+                              return ListTile(
+                                leading: IconButton(
+                                  icon: const Icon(Icons.remove),
+                                  onPressed: () {
+                                    authService.removeProductFromCart(
+                                        prodList[index]['pid']);
+                                  },
+                                ),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.add),
+                                  onPressed: () {
+                                    authService.addProductToCart(
+                                        prodList[index]['pid']);
+                                  },
+                                ),
+                                title: Text(prodList[index]['name'] +
+                                    '   (' +
+                                    prodList[index]['unit'].toString() + ')' + '   Rs: ' + (prodList[index]['price'] * prodList[index]['unit']).toString()) ,
+                                onTap: () {},
+                              );
+                              return Column(
+                                children: [
+                                  Row(
+                                    children: [Text(snapshot.data[index]['name'])],
+                                  ),
+                                ],
+                              );
+                            }),
+                      ),
+                      Text('Total Cart Price: $totalPrice'),
+                      // DropdownButton(
+                      //   // value: prodList[0]['name'], // Set the initial value to the first item in the list
+                      //   onChanged: (newValue) {
+                      //     print('has');
+                      //   },
+                      //   items: prodList.map<DropdownMenuItem<String>>((dynamic value) {
+                      //     print("==================kjhkjxhvjkcsv");
+                      //     print(value);
+                      //     return DropdownMenuItem<String>(
+                      //       value: value.toString(),
+                      //       child: Text(value.toString()),
+                      //     );
+                      //   }).toList(),),
+                      ElevatedButton(
+                        onPressed: () {
+                          if(prodList.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text("Nothing in cart"),
+                            ));
+                            print("Nothing in cart");
+                          }
+                          print('placing the order');
+                        },
+                        child: const Text('Place Order'),
+                      )
+                    ],
+                  );
+                } else if (snapshot.connectionState == ConnectionState.none) {
+                  return const Text("No data");
+                }
+                return const CircularProgressIndicator();
+              }
+              // )
+              // ],
+              ),
+        ),
+      ],
+    );
   }
 }

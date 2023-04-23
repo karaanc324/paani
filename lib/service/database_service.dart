@@ -99,20 +99,29 @@ class DatabaseService {
     return docSnapshot.docs;
   }
 
-  getCart() async {
-    var docSnapshot = await cartCollection.doc(uid).get();
-    if (docSnapshot.exists) {
-      return docSnapshot.get('Products');
-    }
-    return null;
+  getAddr() {
+    return userCollection.doc(uid).get();
+  }
+
+  getAddresses() {
+    return userCollection.doc(uid).snapshots();
+  }
+
+  getCart()  {
+    // var docSnapshot = await cartCollection.doc(uid).get();
+    // if (docSnapshot.exists) {
+    //   return docSnapshot.get('Products');
+    // }
+    // return null;
+    return cartCollection.doc(uid).snapshots();
   }
 
   checkCart(String id) async {
     print(id);
     var docSnapshot = await cartCollection.doc(uid).get();
-    if (docSnapshot.exists) {
+    if (docSnapshot.exists && docSnapshot.get('Products').length > 0) {
       print("---======-----");
-      print(docSnapshot.get('Products')[0]['vendorId']);
+      print(docSnapshot.get('Products'));
 
       if (docSnapshot.get('Products')[0]['vendorId'] != id) {
         return false;
@@ -327,6 +336,23 @@ class DatabaseService {
   Future<void> clearCart() async {
     await cartCollection.doc(uid).delete();
   }
+
+   addAddress(String name, String contact, String fullAddress, String pincode) {
+    print('inside add address========');
+    return userCollection.doc(uid).set({
+      'addresses': FieldValue.arrayUnion([
+        {
+          'name': name,
+          'contact': contact,
+          'fullAddress': fullAddress,
+          'pincode': pincode
+        }
+      ])
+    }, SetOptions(merge: true)
+    );
+  }
+
+
 }
 
 // getProductsOfVendor() {
