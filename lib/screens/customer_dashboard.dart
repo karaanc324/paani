@@ -210,19 +210,6 @@ class Settings extends StatelessWidget {
     );
   }
 }
-//
-// class CartDash extends StatefulWidget {
-//   CartDash({
-//     Key? key,
-//   }) : super(key: key);
-//   final AuthService authService = AuthService();
-//
-//   @override
-//   State<StatefulWidget> createState() {
-//     // TODO: implement createState
-//     throw UnimplementedError();
-//   }
-// }
 
 class CartDash extends StatefulWidget {
   const CartDash({Key? key}) : super(key: key);
@@ -233,133 +220,123 @@ class CartDash extends StatefulWidget {
 
 class _CartDashState extends State<CartDash> {
   final AuthService authService = AuthService();
-  var dropdownValue = [];
+  var dropdownValue = "home";
+  // Map dropdownValue = {};
   late num totalPrice = 0;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    // dropdownValue.add('+ Add Address');
     // authService.getAddresses().data();
 
   }
 
   @override
   Widget build(BuildContext context) {
-    // DropdownMenuItem dropdownValue = DropdownMenuItem(
-
-      // child: const Text('hhhhhh'),
-    // );
-
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        // Flexible(
-        //     child: StreamBuilder(
-        //       stream: authService.getAddresses(),
-        //       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        //         if (snapshot.connectionState == ConnectionState.active) {
-        //           List<dynamic> addresses = snapshot.data['addresses'];
-        //           var dropdownValue = addresses[0];
-        //           return DropdownButton(
-        //             value: dropdownValue, // Set the initial value to the first item in the list
-        //             onChanged: (newValue) {
-        //               print("yqwertyuiop setstate");
-        //               print(newValue);
-        //               setState(() {
-        //                 dropdownValue = newValue;
-        //               });
-        //               print(dropdownValue);
-        //             },
-        //             items: addresses.map<DropdownMenuItem>((dynamic value) {
-        //               print("==================kjhkjxhvjkcsv");
-        //               print(value);
-        //               return DropdownMenuItem(
-        //                 value: value,
-        //                 child: Text(value['name']),
-        //               );
-        //             }).toList(),);
-        //         } else if (snapshot.connectionState == ConnectionState.none) {
-        //           return const Text("No data");
-        //         }
-        //         return const CircularProgressIndicator();
-        //       }
-        //     )
-        // ),
-        // DropdownButton(
-        //     items: dropdownValue[0],
-        //     onChanged: (value) {
-        //
-        //     }),
         Flexible(
           child: StreamBuilder(
               stream: authService.getCart(),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.active) {
                   List<dynamic> prodList = snapshot.data['Products'];
-                  return Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                            itemCount: prodList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              print(prodList[index]['price']);
-                              totalPrice = totalPrice + prodList[index]['price'] * prodList[index]['unit'];
-                              return ListTile(
-                                leading: IconButton(
-                                  icon: const Icon(Icons.remove),
-                                  onPressed: () {
-                                    authService.removeProductFromCart(
-                                        prodList[index]['pid']);
-                                  },
-                                ),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.add),
-                                  onPressed: () {
-                                    authService.addProductToCart(
-                                        prodList[index]['pid']);
-                                  },
-                                ),
-                                title: Text(prodList[index]['name'] +
-                                    '   (' +
-                                    prodList[index]['unit'].toString() + ')' + '   Rs: ' + (prodList[index]['price'] * prodList[index]['unit']).toString()) ,
-                                onTap: () {},
-                              );
-                              return Column(
-                                children: [
-                                  Row(
-                                    children: [Text(snapshot.data[index]['name'])],
+                  if(prodList.length == 0) {
+                    return Text("No item in cart");
+                  }
+                  else {
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                              itemCount: prodList.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                print(prodList[index]['price']);
+                                totalPrice = totalPrice + prodList[index]['price'] * prodList[index]['unit'];
+                                return ListTile(
+                                  leading: IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () {
+                                      authService.removeProductFromCart(
+                                          prodList[index]['pid']);
+                                    },
                                   ),
-                                ],
-                              );
-                            }),
-                      ),
-                      Text('Total Cart Price: $totalPrice'),
-                      // DropdownButton(
-                      //   // value: prodList[0]['name'], // Set the initial value to the first item in the list
-                      //   onChanged: (newValue) {
-                      //     print('has');
-                      //   },
-                      //   items: prodList.map<DropdownMenuItem<String>>((dynamic value) {
-                      //     print("==================kjhkjxhvjkcsv");
-                      //     print(value);
-                      //     return DropdownMenuItem<String>(
-                      //       value: value.toString(),
-                      //       child: Text(value.toString()),
-                      //     );
-                      //   }).toList(),),
-                      ElevatedButton(
-                        onPressed: () {
-                          if(prodList.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text("Nothing in cart"),
-                            ));
-                            print("Nothing in cart");
-                          }
-                          print('placing the order');
-                        },
-                        child: const Text('Place Order'),
-                      )
-                    ],
-                  );
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.add),
+                                    onPressed: () {
+                                      authService.addProductToCart(
+                                          prodList[index]['pid']);
+                                    },
+                                  ),
+                                  title: Text(prodList[index]['name'] +
+                                      '   (' +
+                                      prodList[index]['unit'].toString() + ')' + '   Rs: ' + (prodList[index]['price'] * prodList[index]['unit']).toString()) ,
+                                  onTap: () {},
+                                );
+                              }),
+                        ),
+                        const SizedBox(height: 20),
+                        Text('Total Cart Price: $totalPrice'),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                              child: StreamBuilder(
+                                  stream: authService.getAddresses(),
+                                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.active) {
+                                      List<dynamic> addresses = snapshot.data['addresses'];
+                                      // var dropdownValue = addresses[0];
+                                      print("22222222222222222222222");
+                                      // print(dropdownValue.runtimeType);
+                                      return DropdownButton(
+
+                                        value: dropdownValue, // Set the initial value to the first item in the list
+                                        onChanged: (newValue) {
+                                          print("yqwertyuiop setstate");
+                                          print(newValue);
+                                           setState(() {
+                                            dropdownValue = newValue;
+                                          });
+                                          print(dropdownValue);
+                                        },
+                                        items: addresses.map<DropdownMenuItem>((dynamic value) {
+                                          print("==================kjhkjxhvjkcsv");
+                                          print(value);
+                                          return DropdownMenuItem(
+                                            value: value['type'],
+                                            child: Text(value['name']),
+                                          );
+                                        }).toList(),);
+                                    } else if (snapshot.connectionState == ConnectionState.none) {
+                                      return const Text("No data");
+                                    }
+                                    return const CircularProgressIndicator();
+                                  }
+                              )
+                        ),
+                        // DropdownButton(
+                        //     items: dropdownValue[0],
+                        //     onChanged: (value) {
+                        //
+                        //     }),
+                        ElevatedButton(
+                          onPressed: () {
+                            if(prodList.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                content: Text("Nothing in cart"),
+                              ));
+                              print("Nothing in cart");
+                            }
+                            print('placing the order');
+                          },
+                          child: const Text('Place Order'),
+                        )
+                      ],
+                    );
+                  }
                 } else if (snapshot.connectionState == ConnectionState.none) {
                   return const Text("No data");
                 }
