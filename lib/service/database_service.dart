@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 
@@ -18,6 +20,10 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('product');
   final CollectionReference cartCollection =
       FirebaseFirestore.instance.collection('cart');
+
+  // Object? get currentQuant => null;
+  //
+  // set currentQuant(currentQuant) {}
 
   // get productToUpdate => null;
   //
@@ -107,7 +113,7 @@ class DatabaseService {
     return userCollection.doc(uid).snapshots();
   }
 
-  getCart()  {
+  getCart() {
     // var docSnapshot = await cartCollection.doc(uid).get();
     // if (docSnapshot.exists) {
     //   return docSnapshot.get('Products');
@@ -126,7 +132,6 @@ class DatabaseService {
       if (docSnapshot.get('Products')[0]['vendorId'] != id) {
         return false;
       }
-
     }
     print("not hotdog");
     return true;
@@ -139,32 +144,32 @@ class DatabaseService {
     doc.get().then((docSnapShot) => {
           if (docSnapShot.exists)
             {
-                  checkIfProductInCart(product.pid).then((value) {
-                    if (value) {
-                      addedToCart = true;
-                    } else {
-                      cartCollection.doc(uid).update({
-                        'Products': FieldValue.arrayUnion([
-                          {
-                            'pid': product.pid,
-                            'name': product.name,
-                            'type': product.type,
-                            'description': product.description,
-                            'price': product.price,
-                            'unit': 1,
-                            // 'groups': [],
-                            // 'profilePic': ''
-                          }
-                        ])
-                      });
-                    addedToCart = true;
-                    }
-                  })
-                  // else {
-                  //   cartCollection.doc(uid).get().then((value) => (docs) {
-                  //
-                  //   })
-                  // }
+              checkIfProductInCart(product.pid).then((value) {
+                if (value) {
+                  addedToCart = true;
+                } else {
+                  cartCollection.doc(uid).update({
+                    'Products': FieldValue.arrayUnion([
+                      {
+                        'pid': product.pid,
+                        'name': product.name,
+                        'type': product.type,
+                        'description': product.description,
+                        'price': product.price,
+                        'unit': 1,
+                        // 'groups': [],
+                        // 'profilePic': ''
+                      }
+                    ])
+                  });
+                  addedToCart = true;
+                }
+              })
+              // else {
+              //   cartCollection.doc(uid).get().then((value) => (docs) {
+              //
+              //   })
+              // }
             }
           else
             {
@@ -233,58 +238,97 @@ class DatabaseService {
 
   addProductToCart(int pid) {
     bool addedToCart = false;
+    List cartList = [];
+
     var doc = cartCollection.doc(uid);
-    doc.get().then((docSnapShot) => {
-          if (docSnapShot.exists)
-            {
-              for (int i = 0; i < docSnapShot.get('Products').length; i++)
-                {
-                  if (docSnapShot.get('Products')[i]['pid'] == pid)
-                    {
-                      productToUpdate = docSnapShot.get('Products')[i],
-                      cartCollection.doc(uid).update({
-                        'Products': FieldValue.arrayRemove([productToUpdate])
-                      }),
-                      cartCollection.doc(uid).update({
-                        'Products': FieldValue.arrayUnion([
-                          {
-                            'pid': productToUpdate['pid'],
-                            'name': productToUpdate['name'],
-                            'type': productToUpdate['type'],
-                            'description': productToUpdate['description'],
-                            'price': productToUpdate['price'],
-                            'unit': ++productToUpdate['unit'],
-                            'vendorId': productToUpdate['vendorId']
-                            // 'groups': [],
-                            // 'profilePic': ''
-                          }
-                        ])
-                      }),
-                      addedToCart = true
-                    }
-                  else
-                    {cartCollection.doc(uid).get().then((value) => (docs) {})}
-                }
-            }
-          // else
-          //   {
-          //     cartCollection.doc(uid).set({
-          //       'Products': FieldValue.arrayUnion([
-          //         {
-          //           'pid': product.pid,
-          //           'name': product.name,
-          //           'type': product.type,
-          //           'description': product.description,
-          //           'price': product.price,
-          //           'unit': 1
-          //           // 'groups': [],
-          //           // 'profilePic': ''
-          //         }
-          //       ])
-          //     }),
-          //     addedToCart = true
-          //   }
-        });
+    StreamSubscription<DocumentSnapshot>? listener;
+    // DatabaseReference cartRef = doc.ref('cart');
+    // print("asdasdadasdadasdasdasdasdasdasdasd");
+    listener = doc.snapshots().listen((event) {
+      //  print("dkajshdasudgisakdfglajskdmasdasdasda"),
+      // print(event.get('Products')),
+      List cartList = event.get('Products');
+      print("aaaaaaaaaaaaaaaaa");
+      print(cartList);
+      cartList.firstWhere((element) => element['pid'] == pid)['unit'] =
+          ++cartList.firstWhere((element) => element['pid'] == pid)['unit'];
+      print(cartList);
+      doc.update({'Products': cartList}).then((_) {
+        // Cancel the stream subscription after updating the database
+        listener!.cancel();
+      }).catchError((error) {
+        // Handle any errors that occur during the update
+        print("Error updating cart: $error");
+      });
+    });
+    addedToCart = true;
+
+    // if(addedToCart) {
+    //   listener.cancel();
+    // }
+    // doc.get().then((docSnapShot) => {
+    //       if (docSnapShot.exists)
+    //         {
+    //           // for (int i = 0; i < docSnapShot.get('Products').length; i++)
+    //           //   {
+    //           //     if (docSnapShot.get('Products')[i]['pid'] == pid)
+    //           //       {
+    //           //         productToUpdate = docSnapShot.get('Products')[i],
+    //           //         cartCollection.doc(uid).update({
+    //           //           'Products': FieldValue.arrayRemove([productToUpdate])
+    //           //         }),
+    //           //         cartCollection.doc(uid).update({
+    //           //           'Products': FieldValue.arrayUnion([
+    //           //             {
+    //           //               'pid': productToUpdate['pid'],
+    //           //               'name': productToUpdate['name'],
+    //           //               'type': productToUpdate['type'],
+    //           //               'description': productToUpdate['description'],
+    //           //               'price': productToUpdate['price'],
+    //           //               'unit': ++productToUpdate['unit'],
+    //           //               'vendorId': productToUpdate['vendorId']
+    //           //               // 'groups': [],
+    //           //               // 'profilePic': ''
+    //           //             }
+    //           //           ])
+    //           //         }),
+    //           //         addedToCart = true
+    //           //       }
+    //           //     else
+    //           //       {cartCollection.doc(uid).get().then((value) => (docs) {})}
+    //           //   }
+    //           cartList = docSnapShot.get('Products'),
+    //           // print(cartList.firstWhere((element) => element['pid'] == pid)['unit']),
+    //
+    //           cartList.firstWhere((element) => element['pid'] == pid)['unit'] = ++cartList.firstWhere((element) => element['pid'] == pid)['unit'],
+    //           print("naaaaaaaaaaaa"),
+    //           print(cartList)
+    //         }
+    //
+    //       // else
+    //       //   {
+    //       //     cartCollection.doc(uid).set({
+    //       //       'Products': FieldValue.arrayUnion([
+    //       //         {
+    //       //           'pid': product.pid,
+    //       //           'name': product.name,
+    //       //           'type': product.type,
+    //       //           'description': product.description,
+    //       //           'price': product.price,
+    //       //           'unit': 1
+    //       //           // 'groups': [],
+    //       //           // 'profilePic': ''
+    //       //         }
+    //       //       ])
+    //       //     }),
+    //       //     addedToCart = true
+    //       //   }
+    //     });
+    // print("haaaaaaaaaaa");
+    // print(cartList);
+    // doc.update({
+    //   'Products': cartList
+    // });
     return addedToCart;
   }
 
@@ -303,7 +347,7 @@ class DatabaseService {
     var doc = cartCollection.doc(uid);
     print("aamaa");
     await doc.get().then((docSnapShot) {
-      if(docSnapShot.exists) {
+      if (docSnapShot.exists) {
         print('wow');
         for (int i = 0; i < docSnapShot.get('Products').length; i++) {
           if (docSnapShot.get('Products')[i]['pid'] == pid) {
@@ -337,7 +381,7 @@ class DatabaseService {
     await cartCollection.doc(uid).delete();
   }
 
-   addAddress(String name, String contact, String fullAddress, String pincode) {
+  addAddress(String name, String contact, String fullAddress, String pincode) {
     print('inside add address========');
     return userCollection.doc(uid).set({
       'addresses': FieldValue.arrayUnion([
@@ -348,11 +392,8 @@ class DatabaseService {
           'pincode': pincode
         }
       ])
-    }, SetOptions(merge: true)
-    );
+    }, SetOptions(merge: true));
   }
-
-
 }
 
 // getProductsOfVendor() {
